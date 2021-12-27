@@ -1,4 +1,4 @@
-"use strict"
+"use strict";
 // const http = require("http");
 // const app = http.createServer((req, res) => {
 //     res.writeHead(200, { "Content-Type": "text/html; charset=utf-8" });
@@ -15,15 +15,17 @@
 //     console.log("http로 가동된 서버입니다.");
 // });
 
-
 // 모듈
 const express = require("express");
 const dotenv = require("dotenv");
+const morgan = require("morgan");
+
 const app = express();
 dotenv.config();
 
 // 라우팅
 const home = require("./src/routes/home");
+const accessLogStream = require("./src/config/log");
 
 // 앱 세팅
 app.set("views", "./src/views");
@@ -31,8 +33,9 @@ app.set("view engine", "ejs");
 app.use(express.static(`${__dirname}/src/public`));
 app.use(express.json());
 // URL을 통해 전달되는 데이터에 한글, 공백 등과 같은 문자가 포함될 경우 제대로 인식되지 않는 문제 해결
-app.use(express.urlencoded({ extended: true}));
-
+app.use(express.urlencoded({ extended: true }));
+app.use(morgan("dev"));
+app.use(morgan("common", { stream: accessLogStream }));
 app.use("/", home); // use -> 미들웨어를 등록해주는 메서드
 
 module.exports = app;
